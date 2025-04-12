@@ -6,7 +6,7 @@
 
 	<!--- Set up the application. --->
 	<CFSET THIS.Name="ProgramTree">
-	<CFSET THIS.ApplicationTimeout = CreateTimeSpan( 0, 0, 10, 0 ) />
+	<CFSET THIS.ApplicationTimeout = CreateTimeSpan( 0, 1, 0, 0 ) />
 	<CFSET THIS.SessionManagement=false>
 	<CFSET THIS.SetClientCookies=false>
 	<CFSET THIS.serialization.preserveCaseForStructKey=true>
