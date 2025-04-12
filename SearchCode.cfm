@@ -1,5 +1,3 @@
-<cftry>
-
 <CFPARAM name="URL.search" default="">
 
 <CFSET ResultKeys=ArrayNew(1)>
@@ -18,25 +16,26 @@
 	<CFLOOP index="CR" from="1" to="#DBs.RecordCount#">
 
 		<!--- Find objects --->
-		<CFQUERY name="Progs" datasource="#DSN#" cachedwithin="#CreateTimeSpan(0,0,5,0)#">
-			SELECT 'P' + CONVERT(char(32),HASHBYTES('SHA2_256','#DBs.name[CR]#.'+s.name+'.'+o.name),2) as HashStr
-			FROM [#DBs.name[CR]#].sys.sql_modules m
-			JOIN [#DBs.name[CR]#].sys.objects o ON m.object_id = o.object_id
-			JOIN [#DBs.name[CR]#].sys.schemas s ON s.schema_id = o.schema_id
-			WHERE o.type IN ('P','RF','V','TR','FN','IF','TF','R')
-				AND m.definition LIKE <cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="%#URL.search#%">
-			ORDER BY o.type_desc, s.name, o.name
-		</CFQUERY>
+		<CFTRY>
+			<CFQUERY name="Progs" datasource="#DSN#" cachedwithin="#CreateTimeSpan(0,0,5,0)#">
+				SELECT 'P' + CONVERT(char(32),HASHBYTES('SHA2_256','#DBs.name[CR]#.'+s.name+'.'+o.name),2) as HashStr
+				FROM [#DBs.name[CR]#].sys.sql_modules m
+				JOIN [#DBs.name[CR]#].sys.objects o ON m.object_id = o.object_id
+				JOIN [#DBs.name[CR]#].sys.schemas s ON s.schema_id = o.schema_id
+				WHERE o.type IN ('P','RF','V','TR','FN','IF','TF','R')
+					AND m.definition LIKE <cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="%#URL.search#%">
+				ORDER BY o.type_desc, s.name, o.name
+			</CFQUERY>
 
-		<!--- Append founds keys to results --->
-		<CFSET ArrayAppend(ResultKeys,ValueArray(Progs,"HashStr"),true)>
-
+			<!--- Append founds keys to results --->
+			<CFSET ArrayAppend(ResultKeys,ValueArray(Progs,"HashStr"),true)>
+			<CFCATCH Type="Database">
+				<!--- Eat any errros from the user not having access to the db --->
+			</CFCATCH>
+		</CFTRY>
 	</CFLOOP>
 </CFIF>
 
 <!--- Return the resulting keys as a JSON array --->
 <CFCONTENT type="text/json" reset="true">
 <CFOUTPUT>#SerializeJSON(ResultKeys)#</CFOUTPUT>
-
-
-<cfcatch type="any"><cfdump var=#cfcatch#></cfcatch></cftry>
