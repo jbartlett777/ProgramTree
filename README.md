@@ -1,6 +1,11 @@
 # ProgramTree
 View &amp; search functions, procedures, triggers, &amp; views on MS SQL Server. Requires the "View Definition" permission to view objects on a database.<br>
-```GRANT VIEW DEFINITION TO [user]```
+```
+USE [Database]
+GO
+GRANT VIEW DEFINITION TO [user]
+GO
+```
 
 Demo: https://www.johnwbartlett.com/ProgramTree/
 
