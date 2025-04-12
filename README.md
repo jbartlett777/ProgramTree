@@ -1,5 +1,8 @@
 # ProgramTree
-View &amp; search functions, procedures, triggers, &amp; views on MS SQL Server. Requires the "View Definition" permission to view objects on a database.
+View &amp; search functions, procedures, triggers, &amp; views on MS SQL Server. Requires the "View Definition" permission to view objects on a database.<br>
+```GRANT VIEW DEFINITION TO [user]```
+
+Demo: https://www.johnwbartlett.com/ProgramTree/
 
 Utilizes Fancytree to display a tree of databases and objects on a Microsoft SQL Server to search via name or by code.
 
