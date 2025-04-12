@@ -6,7 +6,7 @@
 
 	<!--- Set up the application. --->
 	<CFSET THIS.Name="ProgramTree">
-	<CFSET THIS.ApplicationTimeout = CreateTimeSpan( 1, 0, 0, 0 ) />
+	<CFSET THIS.ApplicationTimeout = CreateTimeSpan( 0, 0, 10, 0 ) />
 	<CFSET THIS.SessionManagement=false>
 	<CFSET THIS.SetClientCookies=false>
 	<CFSET THIS.serialization.preserveCaseForStructKey=true>
@@ -16,7 +16,7 @@
 	<cfsetting
 		requesttimeout="20"
 		showdebugoutput="false"
-		enablecfoutputonly="false"
+		enablecfoutputonly="true"
 		/>
 
 
@@ -77,7 +77,7 @@
 			required="true"
 			/>
 
-		<CFSET DSN="mssql">
+		<CFSET DSN="ProgramTree">
 		<cfsetting enablecfoutputonly=true>
 
 		<!--- Include the requested page. --->
