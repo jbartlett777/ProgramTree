@@ -126,6 +126,10 @@ YEAR">
 
 <CFPARAM NAME="URL.id" default="">
 <cflock scope="Application" type="readonly" timeout="5">
+	<CFIF StructKeyExists(Application,"Obj") EQ "NO">
+		<CFOUTPUT>Object Data is not available. Please refresh the page</CFOUTPUT>
+		<CFABORT>
+	</CFIF>
 	<CFSET ObjData=Duplicate(Application.Obj)>
 </cflock>
 
