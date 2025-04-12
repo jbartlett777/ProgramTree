@@ -1,4 +1,3 @@
-
 <!--- Fetch all databases --->
 <CFQUERY name="DBs" datasource="#DSN#" cachedwithin="#CreateTimeSpan(0,0,1,0)#">
 	SELECT database_id, name, state_desc
@@ -22,6 +21,7 @@
 	<CFSET S[SIdx].children=ArrayNew(1)>
 
 	<!--- Gather available code types & names --->
+	<CFTRY>
 	<CFQUERY name="Progs" datasource="#DSN#">
 		SELECT 
 			o.object_id,
@@ -69,6 +69,7 @@
 			WHERE Type=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#Types.Type[TIdx]#">
 			ORDER BY SchemaName, ObjectName
 		</CFQUERY>
+
 		<CFLOOP index="PIdx" from="1" to="#PNames.RecordCount#">
 			<!--- Add to JSON array --->
 			<CFSET S[SIdx].children[TIdx].children[PIdx]=StructNew("ordered")>
@@ -82,6 +83,11 @@
 			<CFSET QuerySetCell(Obj,"ObjectName",PNames.ObjectName[PIdx])>
 		</CFLOOP>
 	</CFLOOP>
+	<CFCATCH Type="Database">
+		<!--- Eat any DB error if user does not have access and remove DB from array --->
+		<CFSET ArrayDeleteAt(S,SIdx)>
+	</CFCATCH>
+	</CFTRY>
 </CFLOOP>
 
 <!--- Save Obj cache data to Application scope for use in View.cfm --->
