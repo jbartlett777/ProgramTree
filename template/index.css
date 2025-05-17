@@ -58,11 +58,6 @@
 }
  
 .home-container6 {
-  flex: 1;
-  overflow: auto;
-}
- 
-.home-container7 {
   flex: 0 0 auto;
   width: 20px;
   height: 20px;
@@ -77,6 +72,11 @@
   height: 20px;
   display: none;
   object-fit: cover;
+}
+ 
+.home-container7 {
+  flex: 1;
+  overflow: auto;
 }
  
 .home-container8 {
