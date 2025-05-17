@@ -92,15 +92,6 @@
 	<CFABORT>
 </CFIF>
 
-<!--- Fetch dependencies
-<CFQUERY name="Dept" datasource="#DSN#">
-	SELECT o.object_id, s.name as SchemaName, o.name, Type_Desc
-	FROM [#ObjInfo.Database#].sys.sql_expression_dependencies d
-	JOIN [#ObjInfo.Database#].sys.objects o ON o.object_id=d.referenced_id
-	JOIN [#ObjInfo.Database#].sys.schemas s ON s.schema_id=o.schema_id
-	WHERE d.referencing_id=<cfqueryparam CFSQLType="CF_SQL_INTEGER" value="#Obj.object_id#">
-</CFQUERY>
-<cfdump var=#dept#> --->
 <CFSET SQLCode=Obj.Definition>
 <CFSET OrgSQLCode=SQLCode>
 
