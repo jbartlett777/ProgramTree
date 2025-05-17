@@ -24,3 +24,5 @@ Typing in the "Search Code" field will search the source code for any matches an
 Clicking on any object will display the code for it.
 
 ![image](https://github.com/user-attachments/assets/3f044424-73d3-4f10-8db7-cb2c8dcd0a74)
+
+Note: The ColdFusion datasource should have the CLOB setting enabled for viewing procedures greater than 63,000 characters in size.
