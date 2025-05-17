@@ -1,9 +1,26 @@
 // Tracks the Ajax call being most recently requested, used to ignore older results
 var AjaxID=0;
-
+var KeyTimer;
 $(document).ready(function() {
-	$('#searchcode').on('keyup', function() {
-		let query = $(this).val();
+	// Add debounce timer on search code function
+	$('#searchcode').on('keyup', function(event) {
+		clearTimeout(KeyTimer);
+		if ($(this).val().length < 3) {
+			if (typeof $.ui.fancetree !== 'undefined') {
+				$.ui.fancetree.getTree('#tree').clearFilter();
+				return;
+			}
+		}
+		if (event.key === "Enter" || event.which === 13) {
+			SearchCode($(this).val());
+		} else {
+			KeyTimer=setTimeout(() => {
+				SearchCode($(this).val());
+			}, 1500);
+		}
+	});
+
+	function SearchCode(query) {
 		if (query.length > 2) { // Limit searches to 3 or more searches
 			document.getElementById('search').value=''; // Clear obj field
 			document.getElementById('loading').style.display='block'; // Show loading gif
@@ -29,7 +46,7 @@ $(document).ready(function() {
 		} else {
 			$.ui.fancytree.getTree('#tree').clearFilter();
 		}
-	});
+	};
 
 	// Add click events to buttons
 	document.getElementById('ClearObj').addEventListener('click', function() {
@@ -64,15 +81,21 @@ function ShowTree() {
 			var ID=data.node.key;
 			if (ID.substr(0,1) == 'P') ViewCode(ID);
 		},
+		activate: function(event, data) {
+			var ID=data.node.key;
+			if (ID.substr(0,1) == 'P') ViewCode(ID);
+		},
 		source: Code
 	});
 };	
 
 function ViewCode(ID) {
+	var SearchKey=document.getElementById('searchcode').value;
+	$('#code').html('Loading...');
 	$.ajax({
 		url: 'View.cfm',
 		method: 'GET',
-		data: {ID:ID},
+		data: {ID:ID,SearchKey:SearchKey},
 		success: function(data) {
 			$('#code').html(data); // Display the code
 		}
