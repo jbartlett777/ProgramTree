@@ -9,7 +9,12 @@
 		SELECT name
 		FROM sys.databases
 		WHERE database_id > 4
-		AND state_desc='ONLINE'
+		  AND state_desc='ONLINE'
+		<CFIF ShowOnlyDatabases NEQ "">
+		  AND name IN (<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ShowOnlyDatabases#" list="true">)
+		<CFELSEIF ExcludeDatabases NEQ "">
+		  AND name NOT IN (<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ExcludeDatabases#" list="true">)
+		</CFIF>
 		ORDER BY name
 	</CFQUERY>
 
