@@ -1,13 +1,56 @@
-<!--- Fetch all databases --->
-<CFQUERY name="DBs" datasource="#DSN#" cachedwithin="#CreateTimeSpan(0,0,1,0)#">
-	SELECT database_id, name, state_desc
-	FROM sys.databases
-	WHERE database_id > 4
-	  AND state_desc='ONLINE'
-	ORDER BY name
-</CFQUERY>
-
 <CFSET S=ArrayNew(1)> <!--- Holds Fancytree data for JSON serialization --->
+
+<!--- Fetch all databases --->
+<CFTRY>
+	<CFQUERY name="DBs" datasource="#DSN#" cachedwithin="#CreateTimeSpan(0,0,1,0)#">
+		SELECT database_id, name, state_desc
+		FROM sys.databases
+		WHERE database_id > 4
+		AND state_desc='ONLINE'
+		<CFIF ShowOnlyDatabases NEQ "">
+		AND name IN (<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ShowOnlyDatabases#" list="true">)
+		<CFELSEIF ExcludeDatabases NEQ "">
+		AND name NOT IN (<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ExcludeDatabases#" list="true">)
+		</CFIF>
+		ORDER BY UPPER(name)
+	</CFQUERY>
+	<CFCATCH Type="Any">
+		<!--- Return the error message as part of the fancy tree object --->
+		<CFSET S[1]=StructNew("ordered")>
+		<CFSET S[1].title="Unable to fetch data from the datasource">
+		<CFSET S[1].key="1">
+		<CFSET S[1].folder="true">
+		<CFSET S[2]=StructNew("ordered")>
+		<CFSET S[2].title=CFCATCH.Message>
+		<CFSET S[2].key="2">
+		<CFSET S[2].folder="true">
+		<CFSET S[3]=StructNew("ordered")>
+		<CFSET S[3].title=CFCATCH.Detail>
+		<CFSET S[3].key="2">
+		<CFSET S[3].folder="true">
+		<!--- Send the JSON back --->
+		<CFCONTENT type="text/javascript">
+		<CFOUTPUT>
+		var Code=#SerializeJSON(S)#;
+		</CFOUTPUT>
+		<CFABORT>
+	</CFCATCH>
+</CFTRY>
+
+<CFIF DBs.RecordCount EQ 0>
+	<!--- Return the error message as part of the fancy tree object --->
+	<CFSET S[1]=StructNew("ordered")>
+	<CFSET S[1].title="No visible databases seen. Please check permissions.">
+	<CFSET S[1].key="1">
+	<CFSET S[1].folder="true">
+	<!--- Send the JSON back --->
+	<CFCONTENT type="text/javascript">
+	<CFOUTPUT>
+	var Code=#SerializeJSON(S)#;
+	</CFOUTPUT>
+	<CFABORT>
+</CFIF>
+
 <CFSET Obj=QueryNew("ID,Database,SchemaName,ObjectName","varchar,varchar,varchar,varchar")> <!--- Object cache for App scope for use in View.cfm --->
 <CFSET Key=0>
 <CFLOOP index="CR" from="1" to="#DBs.RecordCount#">
@@ -27,6 +70,8 @@
 			o.object_id,
 			s.name AS SchemaName,
 			o.name AS ObjectName,
+			UPPER(s.name) AS USchemaName,
+			UPPER(o.name) AS UObjectName,
 			CASE o.type WHEN 'P' THEN 'Procedure'
 						WHEN 'FN' THEN 'Function'
 						WHEN 'IF' THEN 'Inline Table Function'
@@ -67,7 +112,7 @@
 			SELECT object_id, SchemaName, ObjectName, HashStr
 			FROM Progs
 			WHERE Type=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#Types.Type[TIdx]#">
-			ORDER BY SchemaName, ObjectName
+			ORDER BY USchemaName, UObjectName
 		</CFQUERY>
 
 		<CFLOOP index="PIdx" from="1" to="#PNames.RecordCount#">
@@ -90,10 +135,9 @@
 	</CFTRY>
 </CFLOOP>
 
-<!--- Save Obj cache data to Application scope for use in View.cfm --->
-<cflock scope="Application" type="Exclusive" timeout="5">
-	<CFSET Application.Obj=Obj>
-</cflock>
+<!--- Save local copy for use in View.cfm --->
+<CFSET JSON=serializeJSON(Obj)>
+<CFFILE action="write" file="#ExpandPath('.')#/Obj.json" output="#JSON#" addnewline="NO" mode="666">
 
 <!--- Send the JSON back --->
 <CFCONTENT type="text/javascript">
