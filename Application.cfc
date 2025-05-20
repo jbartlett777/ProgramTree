@@ -23,7 +23,7 @@
 		<!--- Define arguments. --->
 		<cfargument name="TargetPage" type="string" required="true"/>
 
-		<CFSET DSN="mssql"> <!--- Microsoft Access Datasource name --->
+		<CFSET DSN="mssql"> <!--- Microsoft SQL Server Datasource name --->
 
 		<!--- If specified, only the following databases will be included for display. Comma delimited, no spaces --->
 		<CFSET ShowOnlyDatabases="">
