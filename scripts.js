@@ -97,6 +97,9 @@ function ViewCode(ViewID) {
 	var LastID=BackIDList.split(',').pop();
 	if (LastID != ViewID) {
 		BackIDList=BackIDList + ',' + ViewID;
+		// Limit history to 30 ID's max to keep in cookie max slize
+		if (BackIDList.split(',').length > 31) BackIDList=BackIDList.split(',').slice(1).join(',');
+		// Update Cookie
 		setCookie('BACKID',BackIDList);
 	}
 	// Pull object
