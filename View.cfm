@@ -1,8 +1,17 @@
-<CFPARAM name="URL.ID" default="0">
+<CFPARAM name="URL.ID" default="">
 <CFPARAM name="URL.SearchKey" default="">
 
+<CFSET ViewID=URL.ID>
+
+<CFIF ViewID EQ "">
+	<CFOUTPUT>
+	<span class="home-text">Click on an object to view its Code</span>
+	</CFOUTPUT>
+	<CFABORT>
+</CFIF>
+
 <!--- Load in the object data --->
-<CFPARAM NAME="URL.id" default="">
+<CFPARAM NAME="ViewID" default="">
 <CFSET FN=ExpandPath(".") & "/Obj.json">
 <CFIF FileExists(FN) EQ "NO">
 	<CFOUTPUT>Object data was lost, please refresh the page to restore</CFOUTPUT>
@@ -16,7 +25,7 @@
 <CFQUERY name="ObjInfo" dbtype="Query">
 	SELECT Database, SchemaName, ObjectName
 	FROM ObjData
-	WHERE ID=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#URL.ID#">
+	WHERE ID=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ViewID#">
 </CFQUERY>
 <CFIF ObjInfo.RecordCount EQ 0>
 	<CFOUTPUT>Unable to locate object</CFOUTPUT>
@@ -51,24 +60,32 @@
 </CFLOOP>
 
 <CFOUTPUT>
-<!DOCTYPE HTML>
-<head>
-<style type="text/css">
-body, h2 {font-family:Arial, Helvetica, sans-serif;}
-.Title {font-family:Arial, Helvetica, sans-serif;border-bottom: 1px solid;}
-.Code {overflow-y:scroll;max-height:94vh;white-space:pre;font-family:Courier New;font-size:13px;}
-</style>
-<link href="includes/prism.css" rel="stylesheet">
 </head>
 <body>
 <script src="includes/prism.js"></script>
 <CFSET Title="#Obj.ObjType# #ObjInfo.Database#.#ObjInfo.SchemaName#.#ObjInfo.ObjectName#">
-<span class="Title">#EncodeForHTML(Title)#</span><br>
-Last Updated: #DateTimeFormat(Obj.Modify_Date,"mmmm d, yyyy h:nn:ss tt")#<br>
+<table border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td width="16" valign="top">
+			<CFIF ListLen(Cookie.BACKID) GT 1>
+				<a href="javascript:void(0);" onClick="GoBack()" class="NoUnderline">
+					<img src="images/back.svg" alt="Back to previously viewed procedure" title="Back to previously viewed procedure" width="16" height="16">
+				</a>
+			<CFELSE>
+				<img src="images/blank.svg" width="16" height="16">
+			</CFIF>
+		</td>
+		<td>
+			&nbsp;
+		</td>
+		<td>
+			<span class="Title">#EncodeForHTML(Title)#</span><br>
+			Last Updated: #DateTimeFormat(Obj.Modify_Date,"mmmm d, yyyy h:nn:ss tt")#
+		</td>
+	</tr>
+</table>
 <br>
 <div class="Code"><pre style="background:white; !important"><code class="language-sql line-numbers">#EncodeForHTML(SQLCode)#</code></pre></div>
-</body>
-</html>
 </CFOUTPUT>
 
 <cfscript>

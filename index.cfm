@@ -1,5 +1,8 @@
 <cftry>
 
+<!--- Init Cookie --->
+<CFCOOKIE name="BACKID" value="">
+
 <!--- Load in teleporthq template --->
 <CFFILE action="read" file="#ExpandPath('.')#\template\index.html" variable="HTML">
 
@@ -16,9 +19,16 @@
 <script src="includes/fancytree/jquery.fancytree.min.js"></script>
 <script src="includes/fancytree/modules/jquery.fancytree.filter.js"></script>
 <script src="GetDBObjects.js.cfm"></script>
+<link href="includes/prism.css" rel="stylesheet">
 <script src="scripts.js"></script>
 <style type="text/css">
 ul.fancytree-container {border: none;} /* Override Fancytree border */
+.NoUnderline {
+	text-decoration: none;
+}
+body, h2 {font-family:Arial, Helvetica, sans-serif;}
+.Title {font-family:Arial, Helvetica, sans-serif;border-bottom: 1px solid;}
+.Code {overflow-y:scroll;max-height:94vh;white-space:pre;font-family:Courier New;font-size:13px;}
 </style>
 </CFOUTPUT>
 </CFSAVECONTENT>

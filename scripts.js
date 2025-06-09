@@ -89,15 +89,55 @@ function ShowTree() {
 	});
 };	
 
-function ViewCode(ID) {
+function ViewCode(ViewID) {
 	var SearchKey=document.getElementById('searchcode').value;
+	// Update cookie of ID's viewed (LIFO)
+	var BackIDList=getCookie('BACKID');
+	// Get last item to check for duplicate
+	var LastID=BackIDList.split(',').pop();
+	if (LastID != ViewID) {
+		BackIDList=BackIDList + ',' + ViewID;
+		setCookie('BACKID',BackIDList);
+	}
+	// Pull object
 	$('#code').html('Loading...');
 	$.ajax({
 		url: 'View.cfm',
 		method: 'GET',
-		data: {ID:ID,SearchKey:SearchKey},
+		data: {ID:ViewID,SearchKey:SearchKey},
 		success: function(data) {
 			$('#code').html(data); // Display the code
 		}
 	});
 };
+
+function GoBack() {
+	// Fetch Preview ID viewed (LIFO)
+	var BackIDArray=getCookie('BACKID').split(',');
+	var ViewID=BackIDArray.pop();
+	// Update cookie
+	var BackIDList=BackIDArray.join(',');
+	setCookie('BACKID',BackIDList);
+	// Pull object
+	$('#code').html('Loading...');
+	$.ajax({
+		url: 'View.cfm',
+		method: 'GET',
+		data: {ID:ViewID},
+		success: function(data) {
+			$('#code').html(data); // Display the code
+		}
+	});
+}
+
+
+// Helper to get a cookie by name
+function getCookie(name) {
+	const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+	return match ? decodeURIComponent(match[2]) : null;
+}
+
+// Helper to set a cookie
+function setCookie(name, value) {
+	document.cookie = `${name}=${encodeURIComponent(value)}; path=/`;
+}
