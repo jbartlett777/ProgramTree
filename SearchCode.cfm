@@ -28,7 +28,7 @@
 				JOIN [#DBs.name[CR]#].sys.objects o ON m.object_id = o.object_id
 				JOIN [#DBs.name[CR]#].sys.schemas s ON s.schema_id = o.schema_id
 				WHERE o.type IN ('P','RF','V','TR','FN','IF','TF','R')
-					AND m.definition LIKE <cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="%#URL.search#%">
+					AND m.definition LIKE <cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="%#Trim(URL.search)#%">
 				ORDER BY o.type_desc, s.name, o.name
 			</CFQUERY>
 
