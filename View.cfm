@@ -59,10 +59,14 @@
 	<CFSET SQLCode=Mid(SQLCode,2,Len(SQLCode))>
 </CFLOOP>
 
+<CFSET SQLCode=Replace(SQLCode,"<","&lt;","All")>
+<CFSET SQLCode=Replace(SQLCode,">","&gt;","All")>
+<CFSET Highlight='<span class="Highlight">' & EncodeForHTML(URL.SearchKey) & '</span>'>
+<CFSET SQLCode=ReplaceNoCase(SQLCode,URL.SearchKey,Highlight,"All")>
+
 <CFOUTPUT>
 </head>
 <body>
-<script src="includes/prism.js"></script>
 <CFSET Title="#Obj.ObjType# #ObjInfo.Database#.#ObjInfo.SchemaName#.#ObjInfo.ObjectName#">
 <table border="0" cellpadding="0" cellspacing="0">
 	<tr>
@@ -85,7 +89,7 @@
 	</tr>
 </table>
 <br>
-<div class="Code"><pre style="background:white; !important"><code class="language-sql line-numbers">#EncodeForHTML(SQLCode)#</code></pre></div>
+<div class="Code"><pre style="background:white; !important"><code class="language-sql line-numbers">#SQLCode#</code></pre></div>
 </CFOUTPUT>
 
 <cfscript>

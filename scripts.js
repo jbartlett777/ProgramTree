@@ -110,6 +110,7 @@ function ViewCode(ViewID) {
 		data: {ID:ViewID,SearchKey:SearchKey},
 		success: function(data) {
 			$('#code').html(data); // Display the code
+			RunPrism();
 		}
 	});
 };
@@ -129,6 +130,7 @@ function GoBack() {
 		data: {ID:ViewID},
 		success: function(data) {
 			$('#code').html(data); // Display the code
+			RunPrism();
 		}
 	});
 }
