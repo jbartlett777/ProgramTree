@@ -20,11 +20,22 @@
 <script src="includes/fancytree/modules/jquery.fancytree.filter.js"></script>
 <script src="GetDBObjects.js.cfm"></script>
 <link href="includes/prism.css" rel="stylesheet">
+<script src="includes/prism.js"></script>
 <script src="scripts.js"></script>
 <style type="text/css">
-ul.fancytree-container {border: none;} /* Override Fancytree border */
+ /* Override Fancytree border */
+ul.fancytree-container {
+	border: none;
+}
+.token {
+	line-height: 1.2 !important;
+}
 .NoUnderline {
 	text-decoration: none;
+}
+.Highlight {
+	color: black;
+	background-color: ##ff90ff;
 }
 body, h2 {font-family:Arial, Helvetica, sans-serif;}
 .Title {font-family:Arial, Helvetica, sans-serif;border-bottom: 1px solid;}
