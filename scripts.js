@@ -93,10 +93,15 @@ function ViewCode(ViewID) {
 	var SearchKey=document.getElementById('searchcode').value;
 	// Update cookie of ID's viewed (LIFO)
 	var BackIDList=getCookie('BACKID');
+	if (BackIDList == null || BackIDList == '""') BackIDList='';
 	// Get last item to check for duplicate
 	var LastID=BackIDList.split(',').pop();
 	if (LastID != ViewID) {
-		BackIDList=BackIDList + ',' + ViewID;
+		if (BackIDList == '') {
+			BackIDList=ViewID;
+		} else {
+			BackIDList=BackIDList + ',' + ViewID;
+		}
 		// Limit history to 30 ID's max to keep in cookie max slize
 		if (BackIDList.split(',').length > 31) BackIDList=BackIDList.split(',').slice(1).join(',');
 		// Update Cookie
@@ -118,7 +123,8 @@ function ViewCode(ViewID) {
 function GoBack() {
 	// Fetch Preview ID viewed (LIFO)
 	var BackIDArray=getCookie('BACKID').split(',');
-	var ViewID=BackIDArray.pop();
+	var ViewID=BackIDArray.pop(); // Remove the current page
+	var ViewID=BackIDArray.pop(); // Get the prev page
 	// Update cookie
 	var BackIDList=BackIDArray.join(',');
 	setCookie('BACKID',BackIDList);
