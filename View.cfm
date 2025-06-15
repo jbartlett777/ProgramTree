@@ -64,10 +64,56 @@
 <CFSET Highlight='<span class="Highlight">' & EncodeForHTML(URL.SearchKey) & '</span>'>
 <CFSET SQLCode=ReplaceNoCase(SQLCode,URL.SearchKey,Highlight,"All")>
 
+<!--- Get dependencies --->
+<CFQUERY name="Deps" datasource="#DSN#">
+	SELECT IsNULL(d.referenced_database_name,'#ObjInfo.Database#') as DatabaseName, d.referenced_schema_name as SchemaName, d.referenced_entity_name as ObjectName
+	FROM [#ObjInfo.Database#].sys.objects o
+	INNER JOIN [#ObjInfo.Database#].sys.schemas s ON s.schema_id=o.schema_id
+	INNER JOIN [#ObjInfo.Database#].sys.sql_expression_dependencies d ON d.referencing_id=o.object_id
+	INNER JOIN [#ObjInfo.Database#].sys.objects o2 ON o2.object_id=d.referenced_id
+	WHERE s.name=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ObjInfo.SchemaName#">
+	AND o.name=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ObjInfo.ObjectName#">
+	AND o2.type IN ('P','FN','IF','TF','RF')
+</CFQUERY>
+
+<!--- Get all called procs --->
+<CFSET RegEx='(exec|execute)\s+(\.?(\[|")?[\w\d\s]+(\]|")?){1,2}\.?(\[|")?[\w\d\s]+(\]|")?'>
+<CFSET Execs=REMatchNoCase(RegEx,SQLCode)>
+
+<!--- Loop over found procs and match up against the dependencies --->
+<CFLOOP index="i" from="1" to="#ArrayLen(Execs)#">
+	<CFSET Proc=Trim(ListRest(Execs[i]," "))>
+	<!--- Get DB, Dbo, Proc --->
+	<CFSET Parts=REMatchNoCase("[^\.]+",Proc)>
+	<!--- Flush out missing --->
+	<CFIF ArrayLen(Parts) EQ 2>
+		<CFSET ArrayInsertAt(Parts,1,ObjInfo.Database)>
+	<CFELSEIF ArrayLen(Parts) EQ 1>
+		<CFSET ArrayInsertAt(Parts,1,"dbo")>
+		<CFSET ArrayInsertAt(Parts,1,ObjInfo.Database)>
+	</CFIF>
+	<!--- Identify ID of proc --->
+	<CFQUERY name="ProcInfo" dbtype="Query">
+		SELECT ID
+		FROM ObjData
+		WHERE Database=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#Parts[1]#">
+		  AND SchemaName=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#Parts[2]#">
+		  AND ObjectName=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#Parts[3]#">
+	</CFQUERY>
+	<CFIF ProcInfo.RecordCount EQ 1>
+	<CFSET Execs2=Left(Execs[i],1) & "!~!~!~!~!~!~!~!~!" & Mid(Execs[i],2,Len(Execs[i]))> <!--- prevent against matching dupes --->
+		<CFSET Link='<a href="javascript:void(0)" onClick="ViewCode(''#ProcInfo.ID#'')" title="View Procedure">' & Execs2 & '</a>'>
+		<CFSET SQLCode=Replace(SQLCode,Execs[i],Link)>
+	</CFIF>
+</CFLOOP>
+<!--- Replace substring holders --->
+<CFSET SQLCode=Replace(SQLCode,"!~!~!~!~!~!~!~!~!","","All")>
+
 <CFOUTPUT>
 </head>
 <body>
 <CFSET Title="#Obj.ObjType# #ObjInfo.Database#.#ObjInfo.SchemaName#.#ObjInfo.ObjectName#">
+<cfdump var=#cookie#>
 <table border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td width="16" valign="top">
