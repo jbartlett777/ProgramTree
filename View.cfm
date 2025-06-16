@@ -65,16 +65,21 @@
 <CFSET SQLCode=ReplaceNoCase(SQLCode,URL.SearchKey,Highlight,"All")>
 
 <!--- Get dependencies --->
-<CFQUERY name="Deps" datasource="#DSN#">
-	SELECT IsNULL(d.referenced_database_name,'#ObjInfo.Database#') as DatabaseName, d.referenced_schema_name as SchemaName, d.referenced_entity_name as ObjectName
-	FROM [#ObjInfo.Database#].sys.objects o
-	INNER JOIN [#ObjInfo.Database#].sys.schemas s ON s.schema_id=o.schema_id
-	INNER JOIN [#ObjInfo.Database#].sys.sql_expression_dependencies d ON d.referencing_id=o.object_id
-	INNER JOIN [#ObjInfo.Database#].sys.objects o2 ON o2.object_id=d.referenced_id
-	WHERE s.name=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ObjInfo.SchemaName#">
-	AND o.name=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ObjInfo.ObjectName#">
-	AND o2.type IN ('P','FN','IF','TF','RF')
-</CFQUERY>
+<CFTRY>
+	<CFQUERY name="Deps" datasource="#DSN#">
+		SELECT IsNULL(d.referenced_database_name,'#ObjInfo.Database#') as DatabaseName, d.referenced_schema_name as SchemaName, d.referenced_entity_name as ObjectName
+		FROM [#ObjInfo.Database#].sys.objects o
+		INNER JOIN [#ObjInfo.Database#].sys.schemas s ON s.schema_id=o.schema_id
+		INNER JOIN [#ObjInfo.Database#].sys.sql_expression_dependencies d ON d.referencing_id=o.object_id
+		INNER JOIN [#ObjInfo.Database#].sys.objects o2 ON o2.object_id=d.referenced_id
+		WHERE s.name=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ObjInfo.SchemaName#">
+		AND o.name=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ObjInfo.ObjectName#">
+		AND o2.type IN ('P','FN','IF','TF','RF')
+	</CFQUERY>
+	<CFCATCH Type="Any">
+		<CFSET Deps=QueryNew("id")>
+	</CFCATCH>
+</CFTRY>
 
 <!--- Get all called procs --->
 <CFSET RegEx='(exec|execute)\s+(\.?(\[|")?[\w\d\s]+(\]|")?){1,2}\.?(\[|")?[\w\d\s]+(\]|")?'>

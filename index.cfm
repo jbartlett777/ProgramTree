@@ -8,6 +8,55 @@
 
 <!--- Update inline URL paths & variables--->
 <CFSET HTML=Replace(HTML,'href="./','href="template/','All')>
+
+<!--- Check for proper access to viewable databases --->
+<CFQUERY name="DBs" datasource="#DSN#" cachedwithin="#CreateTimeSpan(0,0,1,0)#">
+	SELECT name
+	FROM sys.databases
+	WHERE database_id > 4
+	AND state_desc='ONLINE'
+	<CFIF ShowOnlyDatabases NEQ "">
+	AND name IN (<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ShowOnlyDatabases#" list="true">)
+	<CFELSEIF ExcludeDatabases NEQ "">
+	AND name NOT IN (<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ExcludeDatabases#" list="true">)
+	</CFIF>
+	ORDER BY UPPER(name)
+</CFQUERY>
+<CFSET PermsNeeded="">
+<CFLOOP index="CR" from="1" to="#DBs.RecordCount#">
+	<CFTRY>
+		<CFQUERY name="CheckObj" datasource="#DSN#">
+			SELECT TOP 1 object_id
+			FROM [#DBs.name[CR]#].sys.objects
+		</CFQUERY>
+		<CFCATCH type="Database">
+			<!--- User does not have access to DB, skip to next one --->
+			<CFCONTINUE>
+		</CFCATCH>
+	</CFTRY>
+	<CFTRY>
+		<!--- Check to see if the user can view sys.sql_expression_dependencies --->
+		<CFIF CheckObj.RecordCount GT 0>
+			<CFQUERY name="Chk" datasource="#DSN#">
+				SELECT referencing_id
+				FROM [#DBs.name[CR]#].sys.sql_expression_dependencies
+				WHERE referencing_id=0
+			</CFQUERY>
+		</CFIF>
+		<CFCATCH Type="Database">
+			<CFSET PermsNeeded=PermsNeeded & "USE [#DBS.name[CR]#]<br>" &
+											 "GO<br>" &
+											 "GRANT VIEW DEFINITION TO [UserName]<br>" &
+											 "GRANT SELECT ON sys.sql_expression_dependencies TO [UserName]<br>" &
+											 "GO<br><br>">
+		</CFCATCH>
+	</CFTRY>
+</CFLOOP>
+<CFIF PermsNeeded NEQ "">
+	<CFSET HTML=Replace(HTML,"Click on an object to view its Code","The following permissions need to be granted in order to view the procedure dependencies with other procedures and navigate between them.<br>" &
+	"<div class=""Code""><pre style=""background:white; !important""><code class=""language-sql"">#PermsNeeded#</code></pre></div>Replace ""UserName"" with the user on the datasource.")>
+</CFIF>
+
 <CFSET HTML=Replace(HTML,'href="public/','href="template/public/','All')>
 
 <!--- Add includes for libries to the head block --->
@@ -41,6 +90,11 @@ body, h2 {font-family:Arial, Helvetica, sans-serif;}
 .Title {font-family:Arial, Helvetica, sans-serif;border-bottom: 1px solid;}
 .Code {overflow-y:scroll;max-height:94vh;white-space:pre;font-family:Courier New;font-size:13px;}
 </style>
+<CFIF PermsNeeded NEQ "">
+	<script language="JavaScript">
+	RunPrism();
+	</script>
+</CFIF>
 </CFOUTPUT>
 </CFSAVECONTENT>
 <CFSET HTML=Replace(HTML,"</head>",Head & "</head>")>
