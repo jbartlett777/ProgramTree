@@ -61,8 +61,10 @@
 
 <CFSET SQLCode=Replace(SQLCode,"<","&lt;","All")>
 <CFSET SQLCode=Replace(SQLCode,">","&gt;","All")>
-<CFSET Highlight='<span class="Highlight">' & EncodeForHTML(URL.SearchKey) & '</span>'>
-<CFSET SQLCode=ReplaceNoCase(SQLCode,URL.SearchKey,Highlight,"All")>
+<CFIF URL.SearchKey NEQ "">
+	<CFSET Highlight='<span class="Highlight">' & EncodeForHTML(URL.SearchKey) & '</span>'>
+	<CFSET SQLCode=ReplaceNoCase(SQLCode,URL.SearchKey,Highlight,"All")>
+</CFIF>
 
 <!--- Get dependencies --->
 <CFTRY>
