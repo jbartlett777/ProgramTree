@@ -57,6 +57,22 @@ $(document).ready(function() {
 		document.getElementById('searchcode').value='';
 		$.ui.fancytree.getTree('#tree').clearFilter();
 	});
+	document.getElementById('SearchList').addEventListener('click', function() {
+		var search=document.getElementById('searchcode').value;
+		if (search.length < 3) return;
+		// Call search
+		$('#code').html('Loading...');
+		$.ajax({
+			url: 'SearchList.cfm',
+			method: 'GET',
+			data: {search:search},
+			success: function(data) {
+				$('#code').html(data); // Display the code
+				RunPrism();
+			}
+		});
+
+	});
 	// Add OnKeyUp events to search boxes
 	document.getElementById('search').addEventListener('keyup', function() {
 		document.getElementById('searchcode').value=''; // Clear code field
@@ -89,7 +105,9 @@ function ShowTree() {
 	});
 };	
 
+var ViewedID=0;
 function ViewCode(ViewID) {
+	ViewedID=ViewID;
 	var SearchKey=document.getElementById('searchcode').value;
 	// Update cookie of ID's viewed (LIFO)
 	var BackIDList=getCookie('BACKID');
@@ -119,6 +137,18 @@ function ViewCode(ViewID) {
 		}
 	});
 };
+
+function ViewRelated() {
+	$.ajax({
+		url: 'Related.cfm',
+		method: 'GET',
+		data: {ID:ViewedID},
+		success: function(data) {
+			$('#PanelSection').html(data); // Display the code
+			RunPrism();
+		}
+	});
+}
 
 function GoBack() {
 	// Fetch Preview ID viewed (LIFO)
@@ -151,4 +181,11 @@ function getCookie(name) {
 // Helper to set a cookie
 function setCookie(name, value) {
 	document.cookie = `${name}=${encodeURIComponent(value)}; path=/`;
+}
+
+var LineArray=[];
+var KeywordLine=0;
+var KeywordMax=0; // variables reset from View.cfm
+function KeywordLine(dir) {
+	KeywordLine=KeywordLike + dir;
 }

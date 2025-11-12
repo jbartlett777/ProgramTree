@@ -31,6 +31,9 @@
 		<!--- If specified, only the following databases will be excluded. This is ignored if ShowOnlyDatabases is populated. Comma delimited, no spaces --->
 		<CFSET ExcludeDatabases="">
 
+		<!--- Get App Dir --->
+		<CFSET RootDir=ExpandPath(".")>
+
 		<cfsetting enablecfoutputonly=true>
 
 		<!--- Include the requested page. --->

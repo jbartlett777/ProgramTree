@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Microsoft SQL Program Tree</title>
+    <title>CodeLine - Microsoft SQL Program Tree</title>
     <meta
       name="description"
       content="View stored procedures and functions and view their relationships"
     />
-    <meta property="og:title" content="Microsoft SQL Program Tree" />
+    <meta property="og:title" content="CodeLine - Microsoft SQL Program Tree" />
     <meta
       property="og:description"
       content="View stored procedures and functions and view their relationships"
@@ -70,74 +70,16 @@
   <body>
     <link rel="stylesheet" href="./style.css" />
     <div>
-      <link href="./index.css" rel="stylesheet" />
+      <link href="./code-line.css" rel="stylesheet" />
 
-      <div class="home-container10">
-        <div class="home-container11">
-          <div class="home-container12">
-            <div class="home-container13">
-              <input
-                type="text"
-                id="search"
-                name="search"
-                placeholder="Filter Objects"
-                autocomplete="off"
-                class="home-textinput1 input Content"
-              />
-              <button id="ClearObj" type="button" class="home-button1 button">
-                x
-              </button>
+      <div class="code-line-container1">
+        <div class="code-line-container2">
+          <div class="code-line-container3"><span>[File]</span></div>
+          <div class="code-line-container4">
+            <div class="code-line-container5"><span>[Line]</span></div>
+            <div class="code-line-container6">
+              <span class="code-line-text3">[Code]</span>
             </div>
-            <div class="home-container14">
-              <input
-                type="text"
-                id="searchcode"
-                placeholder="Search Code (3+ chars)"
-                autocomplete="off"
-                class="home-textinput2 input"
-              />
-              <div>
-                <div class="home-container16">
-                  <style>
-                    .hammy {
-                      width: 12px;
-                      height: 3px;
-                      background-color: black;
-                      margin: 6px 0;
-                    }
-                  </style>
-                  <button id="SearchList" type="button">
-                    <div class="hammy"></div>
-                    <div class="hammy"></div>
-                    <div class="hammy"></div>
-                  </button>
-                </div>
-              </div>
-              <button
-                id="ClearSearch"
-                type="button"
-                class="home-button2 button"
-              >
-                x
-              </button>
-            </div>
-            <div class="home-container17">
-              <img
-                id="loading"
-                alt="loading image"
-                src="https://i.gifer.com/VAyR.gif"
-                loading="eager"
-                class="home-image"
-              />
-            </div>
-            <div class="home-container18">
-              <div id="tree" class="home-container19"></div>
-            </div>
-          </div>
-          <div class="home-container20">
-            <span id="code" class="home-text">
-              Click on an object to view its Code
-            </span>
           </div>
         </div>
       </div>
