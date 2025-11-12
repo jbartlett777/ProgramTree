@@ -48,6 +48,7 @@
 	WHERE s.name=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ObjInfo.SchemaName#">
 	AND o.name=<cfqueryparam CFSQLType="CF_SQL_VARCHAR" value="#ObjInfo.ObjectName#">
 </CFQUERY>
+
 <CFIF Obj.RecordCount EQ 0>
 	<CFOUTPUT>Object not found</CFOUTPUT>
 	<CFABORT>
@@ -120,7 +121,7 @@
 </head>
 <body>
 <CFSET Title="#Obj.ObjType# #ObjInfo.Database#.#ObjInfo.SchemaName#.#ObjInfo.ObjectName#">
-<cfdump var=#cookie#>
+
 <table border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td width="16" valign="top">
@@ -141,8 +142,32 @@
 		</td>
 	</tr>
 </table>
-<br>
+<input type="Button" onClick="OpenPanel()" value="View Table Relationships">
+<CFSET LineArray=ArrayNew(1)>
+<CFIF Trim(URL.SearchKey) EQ "">
+	<br>
+<CFELSE>
+	<input type="button" value="&lt;" disabled="true" id="KeywordLeft" onClick=""> Keyword
+	<input type="button" value="&gt;" id="KeywordRight">
+	<!--- Identify all lines with the keyword --->
+	<CFSET MatchClass="<style>" & Chr(10)>
+	<CFLOOP index="LineNo" from="1" to="#ListLen(SQLCode,Chr(10))#">
+		<CFSET CurrLine=ListGetAt(SQLCode,LineNo,Chr(10),true)>
+		<CFIF FindNoCase(Trim(URL.SearchKey),CurrLine)>
+			<CFSET SQLCode=ListSetAt(SQLCode,LineNo,"<span id=""Line#LineNo#"">#CurrLine#</span>",Chr(10),true)>
+			<CFSET MatchClass=MatchClass & "##Line#LineNo# {transition: background-color 2s ease;}" & Chr(10)>
+		</CFIF>
+		<CFSET LineArray[ArrayLen(LineArray)+1]=LineNo>
+	</CFLOOP>
+	<CFSET MatchClass=MatchClass & "</style>" & Chr(10)>
+	#MatchClass#
+</CFIF>
 <div class="Code"><pre style="background:white; !important"><code class="language-sql line-numbers">#SQLCode#</code></pre></div>
+<script>
+LineArray=#serializeJSON(LineArray)#;
+KeywordLine=-1; // zero index, -1 for no line selected yet
+KeywordMax=LineArray.length--; // One index, so subtract one
+</script>
 </CFOUTPUT>
 
 <cfscript>

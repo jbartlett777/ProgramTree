@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Highlight Example</title>
+<style>
+  /* Base state of the span */
+  #Line1 {transition: background-color 2s ease;}
+
+  /* Highlight effect */
+  .HighlightLine {
+    background-color: yellow;
+  }
+</style>
+</head>
+<body>
+
+<span id="Line1">This is the line to highlight.</span>
+<br><br>
+<button onclick="highlightLine()">Highlight</button>
+
+<script>
+function highlightLine() {
+  const el = document.getElementById("Line1");
+
+  // Add highlight class
+  el.classList.add("HighlightLine");
+
+  // Force reflow so transition triggers
+  void el.offsetWidth;
+
+  // Remove class after 2s so it fades away
+  setTimeout(() => {
+    el.classList.remove("HighlightLine");
+  }, 2000);
+}
+</script>
+
+</body>
+</html>

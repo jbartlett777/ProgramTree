@@ -9,6 +9,12 @@
 <!--- Update inline URL paths & variables--->
 <CFSET HTML=Replace(HTML,'href="./','href="template/','All')>
 
+<!--- Add version to CSS for cache updates --->
+<CFSET FI=GetFileInfo("#RootDir#/index.cfm")>
+<CFSET Ver=DateFormat(FI.LastModified,"yyyymmddHHmmss")>
+<CFSET HTML=Replace(HTML,'href="./style.css"','href="./style.css?ver=#Ver#"')>
+<CFSET HTML=Replace(HTML,'href="./index.css"','href="./index.css?ver=#ver#"')>
+
 <!--- Check for proper access to viewable databases --->
 <CFQUERY name="DBs" datasource="#DSN#" cachedwithin="#CreateTimeSpan(0,0,1,0)#">
 	SELECT name
@@ -63,14 +69,16 @@
 <CFSAVECONTENT variable="Head">
 <CFOUTPUT>
 <script src="includes/jquery-3.6.0.min.js"></script>
-<script src="includes/jquery-ui.min.js"></script>
-<link href="includes/fancytree/skin-xp/ui.fancytree.min.css" rel="stylesheet">
-<script src="includes/fancytree/jquery.fancytree.min.js"></script>
-<script src="includes/fancytree/modules/jquery.fancytree.filter.js"></script>
+<script src="includes/jquery-ui.min.js?Ver=#Ver#"></script>
+<link href="includes/fancytree/skin-xp/ui.fancytree.min.css?Ver=#Ver#" rel="stylesheet">
+<script src="includes/fancytree/jquery.fancytree.min.js?Ver=#Ver#"></script>
+<script src="includes/fancytree/modules/jquery.fancytree.filter.js?Ver=#Ver#"></script>
+<script src="includes/slide-out-panel.min.js"></script> <!--- https://github.com/webdevnerdstuff/jquery-SlideOutPanel --->
+<link href="includes/slide-out-panel.css" rel="stylesheet">
 <script src="GetDBObjects.js.cfm"></script>
-<link href="includes/prism.css" rel="stylesheet">
-<script src="includes/prism.js"></script>
-<script src="scripts.js"></script>
+<link href="includes/prism.css?Ver=#Ver#" rel="stylesheet">
+<script src="includes/prism.js?Ver=#Ver#"></script>
+<script src="scripts.js?Ver=#Ver#"></script>
 <style type="text/css">
  /* Override Fancytree border */
 ul.fancytree-container {
@@ -86,6 +94,13 @@ ul.fancytree-container {
 	color: black;
 	background-color: ##ff90ff;
 }
+.HighlightLine {
+	background-color: yellow;
+}
+.Red {
+	color: red;
+}
+
 body, h2 {font-family:Arial, Helvetica, sans-serif;}
 .Title {font-family:Arial, Helvetica, sans-serif;border-bottom: 1px solid;}
 .Code {overflow-y:scroll;max-height:94vh;white-space:pre;font-family:Courier New;font-size:13px;}
@@ -95,6 +110,13 @@ body, h2 {font-family:Arial, Helvetica, sans-serif;}
 	RunPrism();
 	</script>
 </CFIF>
+<div id="slideoutpanel" class="slide-out-panel">
+<header id="PanelHeader"></header>
+	<section id="PanelSection">
+	</section>
+<footer id="PanelFooter"></footer>
+</div>
+<script src="scripts_panel.js?Ver=#Ver#"></script>
 </CFOUTPUT>
 </CFSAVECONTENT>
 <CFSET HTML=Replace(HTML,"</head>",Head & "</head>")>
@@ -103,4 +125,4 @@ body, h2 {font-family:Arial, Helvetica, sans-serif;}
 <CFOUTPUT>#HTML#</CFOUTPUT>
 
 
-<cfcatch type="any"><cfdump var=#cfcatch#></cfcatch></cftry>
+<cfcatch type="any2"><cfdump var=#cfcatch#></cfcatch></cftry>
