@@ -7,7 +7,9 @@ GRANT VIEW DEFINITION TO [user]
 GO
 ```
 
+<!-- Comment out during surver move
 Demo: https://www.johnwbartlett.com/ProgramTree/
+-->
 
 Utilizes Fancytree to display a tree of databases and objects on a Microsoft SQL Server to search via name or by code.
 
